@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bre_b_pse_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bre_b_pse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bre_b_pse_network
+
+  app:
+    build: .
+    container_name: bre_b_pse_app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: bre_b_pse_db
+      DB_SSLMODE: disable
+      APP_ENV: production
+      APP_PORT: 8080
+      EPAYCO_CLIENT_ID: ${EPAYCO_CLIENT_ID}
+      EPAYCO_CLIENT_SECRET: ${EPAYCO_CLIENT_SECRET}
+      EPAYCO_API_KEY: ${EPAYCO_API_KEY}
+      EPAYCO_PRIVATE_KEY: ${EPAYCO_PRIVATE_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+      TWILIO_WHATSAPP_NUMBER: ${TWILIO_WHATSAPP_NUMBER}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - bre_b_pse_network
+
+volumes:
+  postgres_data:
+
+networks:
+  bre_b_pse_network:
+    driver: bridge
